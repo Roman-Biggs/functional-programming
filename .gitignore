@@ -1,1 +1,26 @@
-/Cyber Tunnel Runner Project/.idea/
+.idea/
+
+!.gitignore
+
+# 01_parallelism
+/01_parallelism/*
+!/01_parallelism/src/
+
+# Cloud Drive Project
+/Cloud Drive Project/*
+!/Cloud Drive Project/src/
+!/Cloud Drive Project/n03_state_modeling_tasks.md
+!/Cloud Drive Project/n04_state_event_logs.md
+!/Cloud Drive Project/README.md
+!/Cloud Drive Project/variant_30_cloud_drive.csv
+
+# Cyber Tunnel Runner Project
+/Cyber Tunnel Runner Project/*
+!/Cyber Tunnel Runner Project/src/
+!/Cyber Tunnel Runner Project/demo_replay.json
+!/Cyber Tunnel Runner Project/README.md
+!/Cyber Tunnel Runner Project/run_replay.json
+
+# n00-initial-project
+/n00-initial-project*
+!/n00-initial-project/src/

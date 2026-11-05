@@ -9,10 +9,10 @@ object CloudLogic {
     drive.baseCapacity + drive.promoCapacity
 
   def activeSpace(drive: CloudDrive): Double =
-    drive.activeFiles.map(_.sizeMb).sum
+    drive.activeSpace
 
   def trashSpace(drive: CloudDrive): Double =
-    drive.trashedFiles.map(_.sizeMb).sum
+    drive.trashSpace
 
   def freeSpace(drive: CloudDrive): Double =
     totalCapacity(drive) - activeSpace(drive)
@@ -26,21 +26,29 @@ object CloudLogic {
     if formattedFile.sizeMb > freeSpace(drive) then
       Left(s"Not enough space for file: ${formattedFile.name}.${formattedFile.fileType}. Free space: ${freeSpace(drive)} MB.")
     else
-      Right(drive.copy(activeFiles = formattedFile :: drive.activeFiles))
+      Right(
+        drive.copy(
+          activeFiles = formattedFile :: drive.activeFiles,
+          activeSpace = drive.activeSpace + formattedFile.sizeMb
+        )
+      )
   }
 
   def moveToTrash(drive: CloudDrive, file: CloudFile): CloudDrive = {
     // Partition method splits list into cortege of two lists by condition(-s)
-    val (toTrash, remainingActive) = drive.activeFiles.partition(x => x.name == file.name && x.fileType == file.fileType)
+    val (toTrash, remainingActive) = drive.activeFiles.partition(x => x.name == file.name && x.fileType == file.fileType.trim().toLowerCase())
+    val movedSize = toTrash.map(_.sizeMb).sum
 
     drive.copy(
       activeFiles = remainingActive,
-      trashedFiles = toTrash ::: drive.trashedFiles // ::: list concatenation (only for List)
+      trashedFiles = toTrash ::: drive.trashedFiles,
+      activeSpace = drive.activeSpace - movedSize,
+      trashSpace = drive.trashSpace + movedSize
     )
   }
 
   def emptyTrash(drive: CloudDrive): CloudDrive =
-    drive.copy(trashedFiles = Nil)
+    drive.copy(trashedFiles = Nil, trashSpace = 0.0)
 
   def applyPromo(drive: CloudDrive, bonusMb: Double): CloudDrive =
     if bonusMb <= 0 then drive
@@ -53,6 +61,6 @@ object CloudLogic {
     if capacity <= 0 then 0.0 else trashSpace(drive) / capacity
 
   def largestFile(drive: CloudDrive): Option[CloudFile] =
-    (drive.activeFiles ++ drive.trashedFiles).maxByOption(_.sizeMb) // ++ concatenation operator (universal)
+    (drive.activeFiles ++ drive.trashedFiles).maxByOption(_.sizeMb) // ++ list concatenation operator (universal)
 
 }
